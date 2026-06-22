@@ -33,12 +33,21 @@ def mix_pase_corrida(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
+def _etiqueta_down(i) -> str:
+    """Down como evento discreto: 1°, 2°, 3°, 4° (nunca un decimal)."""
+    return f"{int(i)}°"
+
+
 def tendencia_por_down(df: pd.DataFrame) -> pd.DataFrame:
     """Conteo de tipo de jugada por down (para heatmap/barras apiladas)."""
-    return (
-        df.pivot_table(index="intento", columns="tipo_jugada", values="id", aggfunc="count", fill_value=0)
+    tabla = (
+        df.dropna(subset=["intento"])
+        .pivot_table(index="intento", columns="tipo_jugada", values="id", aggfunc="count", fill_value=0)
         .sort_index()
     )
+    tabla.index = [_etiqueta_down(i) for i in tabla.index]  # eje categórico, sin decimales
+    tabla.index.name = "Down"
+    return tabla
 
 
 def tendencia_down_distancia(df: pd.DataFrame, bins=(0, 5, 10, 15, 50)) -> pd.DataFrame:
@@ -53,8 +62,11 @@ def tendencia_down_distancia(df: pd.DataFrame, bins=(0, 5, 10, 15, 50)) -> pd.Da
         d.pivot_table(index="intento", columns="rango", values="es_pase", aggfunc="mean", observed=False)
         .mul(100)
         .round(0)
+        .sort_index()
     )
     tabla.columns = tabla.columns.astype(str)  # Plotly no serializa Intervals
+    tabla.index = [_etiqueta_down(i) for i in tabla.index]  # down discreto: 1°, 2°, 3°, 4°
+    tabla.index.name = "Down"
     return tabla
 
 
