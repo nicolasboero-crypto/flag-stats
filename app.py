@@ -103,11 +103,17 @@ col3, col4 = st.columns(2)
 with col3:
     st.subheader("Ranking QB")
     qb = analysis.ranking_qb(df)
-    st.dataframe(qb, use_container_width=True) if not qb.empty else st.info("Sin pases.")
+    if not qb.empty:
+        st.dataframe(qb, use_container_width=True)
+    else:
+        st.info("Sin pases.")
 with col4:
     st.subheader("Ranking Receptores")
     wr = analysis.ranking_wr(df)
-    st.dataframe(wr, use_container_width=True) if not wr.empty else st.info("Sin pases.")
+    if not wr.empty:
+        st.dataframe(wr, use_container_width=True)
+    else:
+        st.info("Sin pases.")
 
 # ----- Fila 3: heatmap de cancha 3x3 -----
 st.subheader("Mapa de calor de la cancha (3×3)")
