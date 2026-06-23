@@ -44,6 +44,14 @@ CREATE TABLE IF NOT EXISTS jugadas (
     zona_profundidad    TEXT,               -- Corto / Medio / Profundo (eje Y: profundidad de la jugada)
     yardas_hechas       INTEGER,            -- yardas ganadas
 
+    -- Defensa
+    defensor_deflexion      TEXT,           -- dorsal del defensor que deflectó el pase (vacío si no hubo)
+    defensor_intercepcion   TEXT,           -- dorsal del defensor que interceptó (vacío si no hubo)
+    int_zona_lado           TEXT,           -- lado donde se produjo la intercepción
+    int_zona_profundidad    TEXT,           -- profundidad donde se produjo la intercepción
+    int_yarda               INTEGER,        -- yarda donde se interceptó
+    int_yarda_devolucion    INTEGER,        -- hasta qué yarda la devolvió
+
     comentario          TEXT,
     creado_en           TEXT    DEFAULT (datetime('now'))
 );

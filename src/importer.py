@@ -35,6 +35,15 @@ COLUMNAS = {
     "lado": "zona_lado",
     "profundidad": "zona_profundidad",
     "yardas hechas": "yardas_hechas",
+    # Defensa
+    "defensor deflexion": "defensor_deflexion",
+    "deflexion": "defensor_deflexion",
+    "defensor intercepcion": "defensor_intercepcion",
+    "intercepcion": "defensor_intercepcion",
+    "lado intercepcion": "int_zona_lado",
+    "profundidad intercepcion": "int_zona_profundidad",
+    "yarda intercepcion": "int_yarda",
+    "yarda devolucion": "int_yarda_devolucion",
     "comentario": "comentario",
     # Por si ya las agregaste a la planilla:
     "rival": "rival",
@@ -42,7 +51,10 @@ COLUMNAS = {
     "equipo": "equipo",
 }
 
-INT_COLS = {"intento", "yardas_situacion", "jugada_nro", "yardas_hechas"}
+INT_COLS = {
+    "intento", "yardas_situacion", "jugada_nro", "yardas_hechas",
+    "int_yarda", "int_yarda_devolucion",
+}
 
 
 def _norm(texto: str) -> str:
@@ -84,9 +96,9 @@ def _importar_filas(
             valor = fila.get(origen)
             if destino in INT_COLS:
                 registro[destino] = _a_int(valor)
-            elif destino == "zona_lado":
+            elif destino in ("zona_lado", "int_zona_lado"):
                 registro[destino] = norm_lado(valor)
-            elif destino == "zona_profundidad":
+            elif destino in ("zona_profundidad", "int_zona_profundidad"):
                 registro[destino] = norm_profundidad(valor)
             else:
                 registro[destino] = valor

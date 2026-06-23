@@ -134,3 +134,27 @@ if not zonas.empty:
     st.plotly_chart(fig, use_container_width=True)
 else:
     st.info("Faltan datos de zona (lado/profundidad).")
+
+# ----- Fila 4: defensa -----
+st.subheader("🛡️ Defensa")
+defensa = analysis.ranking_defensa(df)
+intercepciones = analysis.detalle_intercepciones(df)
+
+d1, d2, d3 = st.columns(3)
+d1.metric("Deflexiones", int(defensa["deflexiones"].sum()) if not defensa.empty else 0)
+d2.metric("Intercepciones", len(intercepciones))
+d3.metric("Yardas devueltas", int(intercepciones["Yardas devueltas"].sum()) if not intercepciones.empty else 0)
+
+col7, col8 = st.columns(2)
+with col7:
+    st.markdown("**Ranking defensivo**")
+    if not defensa.empty:
+        st.dataframe(defensa, use_container_width=True)
+    else:
+        st.info("Sin jugadas defensivas registradas.")
+with col8:
+    st.markdown("**Detalle de intercepciones**")
+    if not intercepciones.empty:
+        st.dataframe(intercepciones, use_container_width=True, hide_index=True)
+    else:
+        st.info("Sin intercepciones registradas.")

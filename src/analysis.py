@@ -127,3 +127,61 @@ def heatmap_zonas(df: pd.DataFrame, valor: str = "conteo") -> pd.DataFrame:
 
     # Reindexar a la grilla completa 3x3 y ordenar ejes.
     return tabla.reindex(index=PROFUNDIDAD_HEATMAP, columns=LADOS)
+
+
+def _no_vacio(df: pd.DataFrame, col: str) -> pd.Series:
+    """Filas donde `col` existe y tiene un valor real (no NaN ni texto vacío)."""
+    if col not in df:
+        return pd.Series(False, index=df.index)
+    s = df[col]
+    return s.notna() & (s.astype(str).str.strip() != "")
+
+
+def ranking_defensa(df: pd.DataFrame) -> pd.DataFrame:
+    """Ranking defensivo por jugador: deflexiones, intercepciones, yardas devueltas."""
+    if df.empty:
+        return pd.DataFrame()
+
+    deflex = (
+        df[_no_vacio(df, "defensor_deflexion")]
+        .groupby("defensor_deflexion").size().rename("deflexiones")
+    )
+
+    inter_df = df[_no_vacio(df, "defensor_intercepcion")].copy()
+    if not inter_df.empty:
+        inter_df["yds_dev"] = (
+            inter_df["int_yarda_devolucion"] - inter_df["int_yarda"]
+        ).abs()
+        inter = inter_df.groupby("defensor_intercepcion").agg(
+            intercepciones=("id", "count"),
+            yardas_devueltas=("yds_dev", "sum"),
+        )
+    else:
+        inter = pd.DataFrame(columns=["intercepciones", "yardas_devueltas"])
+
+    tabla = pd.concat([deflex, inter], axis=1).fillna(0)
+    if tabla.empty:
+        return pd.DataFrame()
+    tabla = tabla.astype({c: int for c in tabla.columns if c != "yardas_devueltas"})
+    tabla.index.name = "defensor"
+    return tabla.sort_values(["intercepciones", "deflexiones"], ascending=False)
+
+
+def detalle_intercepciones(df: pd.DataFrame) -> pd.DataFrame:
+    """Una fila por intercepción: quién, zona, yarda y hasta dónde la devolvió."""
+    inter = df[_no_vacio(df, "defensor_intercepcion")].copy()
+    if inter.empty:
+        return pd.DataFrame()
+    inter["yardas_devueltas"] = (
+        inter["int_yarda_devolucion"] - inter["int_yarda"]
+    ).abs()
+    cols = {
+        "defensor_intercepcion": "Defensor",
+        "int_zona_lado": "Lado",
+        "int_zona_profundidad": "Profundidad",
+        "int_yarda": "Yarda INT",
+        "int_yarda_devolucion": "Devuelta hasta",
+        "yardas_devueltas": "Yardas devueltas",
+    }
+    presentes = [c for c in cols if c in inter.columns]
+    return inter[presentes].rename(columns=cols).reset_index(drop=True)
