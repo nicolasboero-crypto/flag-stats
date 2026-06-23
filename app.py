@@ -6,7 +6,8 @@ Filtra por perspectiva (rival / propio), equipo y partido, y muestra:
   - Mix pase/corrida (torta)
   - Heatmap de tendencia down x distancia (% de pase)
   - Rankings de QB y receptores
-  - Efectividad por tipo de defensa
+  - Mapa de calor de la cancha (3x3)
+  - Defensa: deflecciones e intercepciones
 """
 
 from __future__ import annotations
@@ -81,7 +82,7 @@ with col1:
     mix = analysis.mix_pase_corrida(df)
     if not mix.empty:
         fig = px.pie(mix, names="tipo_jugada", values="porcentaje", hole=0.4)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
 with col2:
     st.subheader("Tendencia: % de Pase por Down × Distancia")
@@ -94,7 +95,7 @@ with col2:
             labels=dict(x="Yardas para situación", y="Down", color="% Pase"),
             aspect="auto",
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     else:
         st.info("Faltan datos de down/distancia.")
 
@@ -104,14 +105,14 @@ with col3:
     st.subheader("Ranking QB")
     qb = analysis.ranking_qb(df)
     if not qb.empty:
-        st.dataframe(qb, use_container_width=True)
+        st.dataframe(qb, width="stretch")
     else:
         st.info("Sin pases.")
 with col4:
     st.subheader("Ranking Receptores")
     wr = analysis.ranking_wr(df)
     if not wr.empty:
-        st.dataframe(wr, use_container_width=True)
+        st.dataframe(wr, width="stretch")
     else:
         st.info("Sin pases.")
 
@@ -134,7 +135,7 @@ if not zonas.empty:
         labels=dict(x="Lado", y="Profundidad", color=metrica),
         aspect="auto",
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 else:
     st.info("Faltan datos de zona (lado/profundidad).")
 
@@ -152,12 +153,12 @@ col7, col8 = st.columns(2)
 with col7:
     st.markdown("**Ranking defensivo**")
     if not defensa.empty:
-        st.dataframe(defensa, use_container_width=True)
+        st.dataframe(defensa, width="stretch")
     else:
         st.info("Sin jugadas defensivas registradas.")
 with col8:
     st.markdown("**Detalle de intercepciones**")
     if not intercepciones.empty:
-        st.dataframe(intercepciones, use_container_width=True, hide_index=True)
+        st.dataframe(intercepciones, width="stretch", hide_index=True)
     else:
         st.info("Sin intercepciones registradas.")
