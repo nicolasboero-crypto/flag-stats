@@ -137,44 +137,59 @@ def _no_vacio(df: pd.DataFrame, col: str) -> pd.Series:
     return s.notna() & (s.astype(str).str.strip() != "")
 
 
+def _yardas_devueltas(d: pd.DataFrame) -> pd.Series:
+    """Yardas devueltas en cada intercepción (0 si faltan las columnas de yarda)."""
+    if {"int_yarda", "int_yarda_devolucion"} <= set(d.columns):
+        return (d["int_yarda_devolucion"] - d["int_yarda"]).abs()
+    return pd.Series(0, index=d.index)
+
+
 def ranking_defensa(df: pd.DataFrame) -> pd.DataFrame:
-    """Ranking defensivo por jugador: deflecciones, intercepciones, yardas devueltas."""
+    """Ranking defensivo por jugador: deflecciones, intercepciones, yardas devueltas.
+
+    Robusto ante columnas defensivas ausentes (bases con esquema viejo): solo
+    agrupa por una columna si realmente hay datos en ella.
+    """
     if df.empty:
         return pd.DataFrame()
 
-    deflex = (
-        df[_no_vacio(df, "defensor_defleccion")]
-        .groupby("defensor_defleccion").size().rename("deflecciones")
-    )
+    partes = []
 
-    inter_df = df[_no_vacio(df, "defensor_intercepcion")].copy()
-    if not inter_df.empty:
-        inter_df["yds_dev"] = (
-            inter_df["int_yarda_devolucion"] - inter_df["int_yarda"]
-        ).abs()
-        inter = inter_df.groupby("defensor_intercepcion").agg(
-            intercepciones=("id", "count"),
-            yardas_devueltas=("yds_dev", "sum"),
+    if _no_vacio(df, "defensor_defleccion").any():
+        partes.append(
+            df[_no_vacio(df, "defensor_defleccion")]
+            .groupby("defensor_defleccion").size().rename("deflecciones")
         )
-    else:
-        inter = pd.DataFrame(columns=["intercepciones", "yardas_devueltas"])
 
-    tabla = pd.concat([deflex, inter], axis=1).fillna(0)
-    if tabla.empty:
+    if _no_vacio(df, "defensor_intercepcion").any():
+        inter_df = df[_no_vacio(df, "defensor_intercepcion")].copy()
+        inter_df["yds_dev"] = _yardas_devueltas(inter_df)
+        partes.append(
+            inter_df.groupby("defensor_intercepcion").agg(
+                intercepciones=("id", "count"),
+                yardas_devueltas=("yds_dev", "sum"),
+            )
+        )
+
+    if not partes:
         return pd.DataFrame()
-    tabla = tabla.astype({c: int for c in tabla.columns if c != "yardas_devueltas"})
+
+    tabla = pd.concat(partes, axis=1).fillna(0)
+    for col in ("deflecciones", "intercepciones", "yardas_devueltas"):
+        if col not in tabla.columns:
+            tabla[col] = 0
+    tabla = tabla[["deflecciones", "intercepciones", "yardas_devueltas"]]
+    tabla = tabla.astype({"deflecciones": int, "intercepciones": int})
     tabla.index.name = "defensor"
     return tabla.sort_values(["intercepciones", "deflecciones"], ascending=False)
 
 
 def detalle_intercepciones(df: pd.DataFrame) -> pd.DataFrame:
     """Una fila por intercepción: quién, zona, yarda y hasta dónde la devolvió."""
-    inter = df[_no_vacio(df, "defensor_intercepcion")].copy()
-    if inter.empty:
+    if not _no_vacio(df, "defensor_intercepcion").any():
         return pd.DataFrame()
-    inter["yardas_devueltas"] = (
-        inter["int_yarda_devolucion"] - inter["int_yarda"]
-    ).abs()
+    inter = df[_no_vacio(df, "defensor_intercepcion")].copy()
+    inter["yardas_devueltas"] = _yardas_devueltas(inter)
     cols = {
         "defensor_intercepcion": "Defensor",
         "int_zona_lado": "Lado",
