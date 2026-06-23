@@ -138,13 +138,13 @@ def _no_vacio(df: pd.DataFrame, col: str) -> pd.Series:
 
 
 def ranking_defensa(df: pd.DataFrame) -> pd.DataFrame:
-    """Ranking defensivo por jugador: deflexiones, intercepciones, yardas devueltas."""
+    """Ranking defensivo por jugador: deflecciones, intercepciones, yardas devueltas."""
     if df.empty:
         return pd.DataFrame()
 
     deflex = (
-        df[_no_vacio(df, "defensor_deflexion")]
-        .groupby("defensor_deflexion").size().rename("deflexiones")
+        df[_no_vacio(df, "defensor_defleccion")]
+        .groupby("defensor_defleccion").size().rename("deflecciones")
     )
 
     inter_df = df[_no_vacio(df, "defensor_intercepcion")].copy()
@@ -164,7 +164,7 @@ def ranking_defensa(df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
     tabla = tabla.astype({c: int for c in tabla.columns if c != "yardas_devueltas"})
     tabla.index.name = "defensor"
-    return tabla.sort_values(["intercepciones", "deflexiones"], ascending=False)
+    return tabla.sort_values(["intercepciones", "deflecciones"], ascending=False)
 
 
 def detalle_intercepciones(df: pd.DataFrame) -> pd.DataFrame:

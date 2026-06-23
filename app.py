@@ -144,7 +144,7 @@ defensa = analysis.ranking_defensa(df)
 intercepciones = analysis.detalle_intercepciones(df)
 
 d1, d2, d3 = st.columns(3)
-d1.metric("Deflexiones", int(defensa["deflexiones"].sum()) if not defensa.empty else 0)
+d1.metric("Deflecciones", int(defensa["deflecciones"].sum()) if not defensa.empty else 0)
 d2.metric("Intercepciones", len(intercepciones))
 d3.metric("Yardas devueltas", int(intercepciones["Yardas devueltas"].sum()) if not intercepciones.empty else 0)
 

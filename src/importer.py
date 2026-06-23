@@ -36,8 +36,10 @@ COLUMNAS = {
     "profundidad": "zona_profundidad",
     "yardas hechas": "yardas_hechas",
     # Defensa
-    "defensor deflexion": "defensor_deflexion",
-    "deflexion": "defensor_deflexion",
+    "defensor defleccion": "defensor_defleccion",
+    "defleccion": "defensor_defleccion",
+    "defensor deflexion": "defensor_defleccion",  # tolera la grafía vieja
+    "deflexion": "defensor_defleccion",
     "defensor intercepcion": "defensor_intercepcion",
     "intercepcion": "defensor_intercepcion",
     "lado intercepcion": "int_zona_lado",

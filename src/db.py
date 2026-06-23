@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS jugadas (
     yardas_hechas       INTEGER,            -- yardas ganadas
 
     -- Defensa
-    defensor_deflexion      TEXT,           -- dorsal del defensor que deflectó el pase (vacío si no hubo)
+    defensor_defleccion     TEXT,           -- dorsal del defensor que deflectó el pase (vacío si no hubo)
     defensor_intercepcion   TEXT,           -- dorsal del defensor que interceptó (vacío si no hubo)
     int_zona_lado           TEXT,           -- lado donde se produjo la intercepción
     int_zona_profundidad    TEXT,           -- profundidad donde se produjo la intercepción
