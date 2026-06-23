@@ -117,7 +117,10 @@ with col4:
 
 # ----- Fila 3: heatmap de cancha 3x3 -----
 st.subheader("Mapa de calor de la cancha (3×3)")
-st.caption("Eje X = lado del lanzamiento · Eje Y = profundidad de la jugada")
+st.caption(
+    "Eje X = lado del lanzamiento · Eje Y = profundidad de la jugada — "
+    "Corto: 0 a 7 yardas · Medio: 8 a 15 yardas · Profundo: +15 yardas"
+)
 metrica = st.radio(
     "Métrica", ["conteo", "yardas"], horizontal=True,
     format_func=lambda x: "Cantidad de jugadas" if x == "conteo" else "Yardas promedio",

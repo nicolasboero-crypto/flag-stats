@@ -14,6 +14,26 @@ LADOS = ["Izquierda", "Medio", "Derecha"]            # eje X, de izq a der
 PROFUNDIDADES = ["Corto", "Medio", "Profundo"]        # eje Y, de cerca a lejos
 PROFUNDIDAD_HEATMAP = ["Profundo", "Medio", "Corto"]  # filas del heatmap (lejos arriba)
 
+# Rangos de yardas que definen cada profundidad de la jugada.
+RANGOS_PROFUNDIDAD = {
+    "Corto": "0 a 7 yardas",
+    "Medio": "8 a 15 yardas",
+    "Profundo": "más de 15 yardas",
+}
+
+
+def clasificar_profundidad(yardas) -> str | None:
+    """Convierte una cantidad de yardas en su profundidad (Corto/Medio/Profundo)."""
+    try:
+        y = float(yardas)
+    except (ValueError, TypeError):
+        return None
+    if y <= 7:
+        return "Corto"
+    if y <= 15:
+        return "Medio"
+    return "Profundo"
+
 # Sinónimos aceptados al importar (tolerante a abreviaturas).
 _ALIAS_LADO = {
     "izquierda": "Izquierda", "izq": "Izquierda", "i": "Izquierda",
